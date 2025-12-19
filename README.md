@@ -1,4 +1,4 @@
-# ShopAssist AI – Support Chatbot (Machine Task Submission)
+# ShopAssist AI – Support Chatbot 
 
 This project is a simple but production-minded AI support chatbot for a fictional e-commerce store.
 
