@@ -8,7 +8,6 @@ It demonstrates:
 - Safe, scoped LLM usage
 - Thoughtful handling of edge cases and failures
 
-⚠️ **No deployment is required by the task.**  
 This repository focuses on correctness, robustness, and code quality.
 
 ---
