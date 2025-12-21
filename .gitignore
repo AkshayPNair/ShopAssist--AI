@@ -12,6 +12,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+.env
 frontend/.env
 backend/src/config/.env
 
