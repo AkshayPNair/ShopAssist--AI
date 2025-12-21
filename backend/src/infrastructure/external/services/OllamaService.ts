@@ -32,12 +32,12 @@ export class OllamaService implements ILLMService {
             const response = await axios.post(
                 `${process.env.OLLAMA_BASE_URL}/api/generate`,
                 {
-                    model: "mistral",
+                    model: "phi3:mini",
                     prompt,
                     stream: false,
                 },
                 {
-                    timeout: 60_000, //20s hard timeout
+                    timeout: 60_000, //60s hard timeout
                 }
             )
 
