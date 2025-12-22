@@ -9,6 +9,7 @@ type Role = "user" | "assistant"
 export class OllamaService implements ILLMService {
     async generateReply(history: { role: Role; content: string }[], userMessage: string): Promise<string> {
         try {
+            const trimmedHistory = history.slice(-4)
             const prompt = `You are a helpful support agent for a small e-commerce store. 
                 
            Rules (IMPORTANT):
@@ -21,13 +22,14 @@ export class OllamaService implements ILLMService {
             - Only use the FAQ when the question clearly relates to the store.
             - Answer clearly, concisely, and politely.
 
+            
 
             Conversation history:
-            ${history.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join("\n")} 
+            ${trimmedHistory.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join("\n")} 
                 
             USER: ${userMessage}
             ASSISTANT:`
-            .trim()
+                .trim()
 
             const response = await axios.post(
                 `${process.env.OLLAMA_BASE_URL}/api/generate`,
@@ -35,6 +37,10 @@ export class OllamaService implements ILLMService {
                     model: "phi3:mini",
                     prompt,
                     stream: false,
+                    options: {
+                        num_predict: 150,
+                        temperature: 0.3
+                    }
                 },
                 {
                     timeout: 60_000, //60s hard timeout
