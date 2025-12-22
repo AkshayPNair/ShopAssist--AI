@@ -27,7 +27,6 @@ export class OllamaService implements ILLMService {
             Conversation history:
             ${trimmedHistory.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join("\n")} 
                 
-            USER: ${userMessage}
             ASSISTANT:`
                 .trim()
 
@@ -43,7 +42,7 @@ export class OllamaService implements ILLMService {
                     }
                 },
                 {
-                    timeout: 60_000, //60s hard timeout
+                    timeout: 120_000, //2minutes hard timeout (initial start is slower)
                 }
             )
 

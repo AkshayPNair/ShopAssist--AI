@@ -21,7 +21,7 @@ export class SendChatMessageUseCase implements ISendChatMessageService {
 
     async execute(input: SendChatMessageDTO): Promise<{ reply: string; sessionId: string; }> {
         const { message, sessionId } = input
-        let MAX_MESSAGE_LENGTH= 500
+        let MAX_MESSAGE_LENGTH = 500
         if (!message || !message.trim()) {
             throw new AppError(
                 ErrorCode.VALIDATION_ERROR,
@@ -31,9 +31,9 @@ export class SendChatMessageUseCase implements ISendChatMessageService {
         }
 
         const sanitizedMessage =
-        message.length > MAX_MESSAGE_LENGTH
-          ? message.slice(0, MAX_MESSAGE_LENGTH)
-          : message;
+            message.length > MAX_MESSAGE_LENGTH
+                ? message.slice(0, MAX_MESSAGE_LENGTH)
+                : message;
 
         let conversationId = sessionId
         if (!conversationId) {
@@ -70,6 +70,13 @@ export class SendChatMessageUseCase implements ISendChatMessageService {
                 content: msg.text
             }))
         ]
+
+        if (message.trim().length < 2 ) {
+            return {
+                reply: "Could you please clarify what you need help with?",
+                sessionId: conversationId
+            };
+        }
 
 
         const reply = await this._llmService.generateReply(history, sanitizedMessage)
