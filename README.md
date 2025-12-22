@@ -38,16 +38,22 @@ This repository focuses on correctness, robustness, and code quality.
 ---
 
 ### LLM Integration
+
+The application supports both **local** and **hosted** inference modes.
+
+#### Local Development
 - Uses **Ollama (local LLM)** with the `mistral` model
-- LLM access wrapped behind an interface (`ILLMService`)
-- Prompt includes:
-  - Store FAQ (domain knowledge)
-  - Conversation history
-  - Explicit behavior rules (clarification, scope enforcement)
-- Graceful handling of:
-  - Timeouts
-  - Model failures
-  - Temporary unavailability
+- No external API dependency
+- Fully reproducible offline
+- Ideal for local testing and iteration
+
+#### Hosted Deployment
+- Uses **OpenRouter** with the `mistral-small-3.1-24b-instruct (free)` model
+- Same prompt logic and behavior as the local version
+- Keeps deployment lightweight and portable
+- LLM access is fully abstracted behind `ILLMService`
+
+> Note: When using the OpenRouter free tier, rate limiting (HTTP 429) may occur under repeated requests. This is a service-side constraint and does not affect the application’s core logic, validation, or architecture.
 
 ---
 
@@ -293,6 +299,54 @@ npm run dev
 ### Fetch History
 `GET /api/chat/history/:sessionId`
 
+---
+
+## ☁️ Hosted Deployment (EC2)
+
+This project is deployed on an AWS EC2 instance with the following setup:
+
+### Frontend
+- Built using **React + TypeScript**
+- Served via **Nginx**
+- Static build served from `/var/www`
+- HTTPS enabled using **Let’s Encrypt**
+
+### Backend
+- Built with **Node.js + TypeScript**
+- Runs via **PM2** for process management
+- Exposed behind **Nginx reverse proxy**
+- HTTPS enabled using **Let’s Encrypt**
+
+### Infrastructure
+- **PostgreSQL** running in Docker
+- **Redis** running locally on the EC2 instance
+- Environment variables managed via `.env`
+- No secrets committed to the repository
+
+### Process Management
+- Backend automatically restarts on failure via PM2
+- Docker containers persist independently of SSH sessions
+
+---
+
+### Hosted Environment (EC2)
+
+```bash
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=spur_ai
+
+REDIS_URL=redis://localhost:6379
+
+# Hosted inference
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_API_KEY=your_key_here
+```
+
 ## 🧪 Edge Cases Handled
 
 - **Empty input** → validation error
@@ -307,7 +361,7 @@ npm run dev
 ### Trade-offs
 - **FAQ is hardcoded** (simple, explicit, safe)
 - **No auth** (out of scope per task)
-- **Local LLM instead of hosted API** (free, reproducible)
+- **Local LLM for development, hosted LLM for deployment** (balances reproducibility and portability)
 - **Redis used locally** for simplicity
 
 ### If I had more time
@@ -334,6 +388,14 @@ The following are intentional simplifications made to keep the scope focused for
   No secrets are committed to the repository.
 
 These choices do **not** affect correctness or robustness and were made to keep the project minimal, readable, and aligned with the task requirements.
+
+
+## 🚀 Deployment Note
+
+The hosted version preserves the exact same logic and architecture as the local version.  
+The only change is the LLM provider (Ollama → OpenRouter), which is fully abstracted behind an interface.
+
+All validation, error handling, caching, and conversation persistence behave identically in both environments.
 
 
 ## ✅ Summary
