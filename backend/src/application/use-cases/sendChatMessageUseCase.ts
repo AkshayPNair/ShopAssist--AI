@@ -35,7 +35,17 @@ export class SendChatMessageUseCase implements ISendChatMessageService {
                 ? message.slice(0, MAX_MESSAGE_LENGTH)
                 : message;
 
-        let conversationId = sessionId
+        let conversationId: string | null | undefined = sessionId
+
+        if (conversationId) {
+            const conversationExists =
+                await this._conversationRepository.findById(conversationId);
+
+            if (!conversationExists) {
+                conversationId = null;
+            }
+        }
+
         if (!conversationId) {
             const conversation = await this._conversationRepository.create();
             conversationId = conversation.id;
@@ -63,21 +73,17 @@ export class SendChatMessageUseCase implements ISendChatMessageService {
                 600
             )
         }
-        const history = [
-            { role: 'system', content: STORE_FAQ },
-            ...previousMessages.map((msg: Message) => ({
-                role: msg.sender === "user" ? "user" : "assistant",
-                content: msg.text
-            }))
-        ]
+        const history = previousMessages.map((msg: Message) => ({
+            role: msg.sender === "user" ? "user" : "assistant",
+            content: msg.text
+        }))
 
-        if (message.trim().length < 2 ) {
+        if (message.trim().length < 2) {
             return {
                 reply: "Could you please clarify what you need help with?",
                 sessionId: conversationId
             };
         }
-
 
         const reply = await this._llmService.generateReply(history, sanitizedMessage)
 

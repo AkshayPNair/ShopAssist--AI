@@ -3,14 +3,14 @@ import { ConversationRepository } from "../../infrastructure/database/repositori
 import { MessageRepository } from "../../infrastructure/database/repositories/messageRepository";
 import { SendChatMessageUseCase } from "../../application/use-cases/sendChatMessageUseCase";
 import { ChatController } from "../controllers/chat.controller";
-import { OllamaService } from "../../infrastructure/external/services/OllamaService";
 import { RedisCacheService } from "../../infrastructure/external/cache/redisCacheService";
+import { OpenRouterLLMService } from "../../infrastructure/external/services/OpenRouterLLMService";
 
 const router = Router();
 
 const conversationRepository = new ConversationRepository()
 const messageRepository=new MessageRepository()
-const llmService = new OllamaService()
+const llmService = new OpenRouterLLMService()
 const redisCacheService = new RedisCacheService()
 
 const sendChatMessageUseCase=new SendChatMessageUseCase(messageRepository,conversationRepository,llmService,redisCacheService)
