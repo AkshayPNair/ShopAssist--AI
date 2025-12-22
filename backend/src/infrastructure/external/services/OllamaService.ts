@@ -26,7 +26,8 @@ export class OllamaService implements ILLMService {
 
             Conversation history:
             ${trimmedHistory.map(msg => `${msg.role.toUpperCase()}: ${msg.content}`).join("\n")} 
-                
+             
+            USER: ${userMessage}
             ASSISTANT:`
                 .trim()
 
